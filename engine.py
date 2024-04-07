@@ -15,6 +15,7 @@ import torch
 import util.misc as utils
 from datasets.coco_eval import CocoEvaluator
 from datasets.panoptic_eval import PanopticEvaluator
+import wandb
 
 
 def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
@@ -93,6 +94,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
             if epoch >= args.ema_epoch:
                 ema_m.update(model)
 
+        wandb.log({"loss": loss_value, "loss_dict": loss_dict_reduced, "lr": optimizer.param_groups[0]["lr"]})
         metric_logger.update(loss=loss_value, **loss_dict_reduced_scaled, **loss_dict_reduced_unscaled)
         if 'class_error' in loss_dict_reduced:
             metric_logger.update(class_error=loss_dict_reduced['class_error'])

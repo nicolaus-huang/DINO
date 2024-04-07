@@ -21,6 +21,7 @@ import util.misc as utils
 import datasets
 from datasets import build_dataset, get_coco_api_from_dataset
 from engine import evaluate, train_one_epoch, test
+import wandb
 
 
 
@@ -84,6 +85,7 @@ def build_model_main(args):
     return model, criterion, postprocessors
 
 def main(args):
+    wandb.init(project="DINO", name="experiment-reproduce", config=args)
     utils.init_distributed_mode(args)
     # load cfg file and update the args
     print("Loading config file from {}".format(args.config_file))
@@ -143,6 +145,7 @@ def main(args):
     model, criterion, postprocessors = build_model_main(args)
     wo_class_error = False
     model.to(device)
+    wandb.watch(model)
 
     # ema
     if args.use_ema:
